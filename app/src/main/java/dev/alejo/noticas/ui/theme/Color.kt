@@ -1,4 +1,17 @@
+package dev.alejo.noticas.ui.theme
+
 import androidx.compose.ui.graphics.Color
+
+val pinkViolet = Color(0xFFFD99FF)
+val coralPink = Color(0xFFFF9D9E)
+val lightGreen = Color(0xFF90F48E)
+val softOrange = Color(0xFFFFD6A5)
+val mintGreen = Color(0xFFA5FFD6)
+val lavender = Color(0xFFB69CFF)
+val paleTeal = Color(0xFFB5EAEA)
+val lightLilac = Color(0xFFE4C1F9)
+val skyBlue = Color(0xFFACE7FF)
+val warmBeige = Color(0xFFFFE5B4)
 
 val primaryLight = Color(0xFF725C0C)
 val onPrimaryLight = Color(0xFFFFFFFF)
