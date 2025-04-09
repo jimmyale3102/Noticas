@@ -1,6 +1,9 @@
 package dev.alejo.noticas.ui.notes
 
-import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,12 +13,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -28,31 +35,53 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.alejo.noticas.R
+import dev.alejo.noticas.domain.model.Note
+import dev.alejo.noticas.ui.notes.components.NoteItem
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun NotesScreen(superInnerPadding: PaddingValues = PaddingValues()) {
+fun SharedTransitionScope.NotesScreen(
+    superInnerPadding: PaddingValues = PaddingValues(),
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    state: NotesState,
+    onEvent: (NotesEvent) -> Unit = {},
+    onCreateNote: () -> Unit,
+) {
     Scaffold(
-        modifier = Modifier.padding(superInnerPadding).fillMaxSize(),
+        modifier = Modifier
+            .padding(superInnerPadding)
+            .fillMaxSize(),
         topBar = { NotesAppBar() },
         floatingActionButton = {
-            FloatingActionButton(onClick = { }) {
-                Icon(imageVector = Icons.Filled.Info, contentDescription = null)
+            FloatingActionButton(
+                onClick = { onCreateNote() },
+                modifier = Modifier
+                    .sharedBounds(
+                        sharedContentState = rememberSharedContentState(
+                            key = CREATE_NOTE_FAB_KEY
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+            ) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = null)
             }
         }
     ) { innerPadding ->
-        val condition = false
-        if (condition) {
-            NotesContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            )
-        } else {
-            EmptyNotesContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            )
+        AnimatedContent(state.notes) { notesData ->
+            if (notesData.isEmpty()) {
+                EmptyNotesContent(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
+            } else {
+                NotesContent(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    notes = notesData
+                )
+            }
         }
     }
 }
@@ -80,9 +109,16 @@ fun EmptyNotesContent(modifier: Modifier) {
 }
 
 @Composable
-fun NotesContent(modifier: Modifier) {
-    Column(modifier = modifier) {
-
+fun NotesContent(modifier: Modifier, notes: List<Note>) {
+    LazyVerticalGrid(
+        modifier = modifier.padding(horizontal = 16.dp),
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(notes.size) { index ->
+            NoteItem(notes[index])
+        }
     }
 }
 
@@ -97,20 +133,57 @@ fun NotesAppBar() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
-        SmallFloatingActionButton(onClick = { }) {
+        SmallFloatingActionButton(
+            onClick = { },
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        ) {
             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
         }
         SmallFloatingActionButton(
             modifier = Modifier.padding(start = 16.dp),
-            onClick = { }) {
+            onClick = { },
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        ) {
             Icon(imageVector = Icons.Filled.Info, contentDescription = null)
         }
     }
 }
 
-// Night mode
 @Preview
 @Composable
 fun NotesAppBarPreview() {
-    NotesScreen()
+//    NotesScreen(
+//        state = NotesState(
+//            notes = listOf(
+//                Note(
+//                    title = "Hey youuu",
+//                    content = "Content",
+//                    timestamp = 0,
+//                    color = Note.noteColors[1].toArgb()
+//                ),
+//                Note(
+//                    title = "Title",
+//                    content = "Content",
+//                    timestamp = 0,
+//                    color = Note.noteColors[3].toArgb()
+//                ),
+//                Note(
+//                    title = "Proo",
+//                    content = "Content",
+//                    timestamp = 0,
+//                    color = Note.noteColors[2].toArgb()
+//                ),
+//                Note(
+//                    title = "Title",
+//                    content = "Content",
+//                    timestamp = 0,
+//                    color = Note.noteColors[0].toArgb()
+//                )
+//            )
+//        ),
+//        onEvent = {},
+//        onCreateNote = {}
+//    )
 }
