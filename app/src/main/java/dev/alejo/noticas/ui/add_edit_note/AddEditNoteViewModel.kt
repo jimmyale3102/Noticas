@@ -1,0 +1,31 @@
+package dev.alejo.noticas.ui.add_edit_note
+
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import javax.inject.Inject
+
+@HiltViewModel
+class AddEditNoteViewModel @Inject constructor() : ViewModel() {
+
+    private val _state = MutableStateFlow(AddEditNoteState())
+    val state : StateFlow<AddEditNoteState> = _state
+
+    fun onEvent(event: AddEditNoteEvent) {
+        when (event) {
+            is AddEditNoteEvent.ChangeColor -> {
+                _state.update { state ->
+                    state.copy(backgroundColor = Color(event.color))
+                }
+            }
+            AddEditNoteEvent.SaveNote -> {
+
+            }
+        }
+
+    }
+
+}
