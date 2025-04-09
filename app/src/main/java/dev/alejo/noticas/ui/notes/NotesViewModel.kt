@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.alejo.noticas.domain.repository.Repository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ class NotesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NotesState())
-    val state = _state.asStateFlow()
+    val state: StateFlow<NotesState> = _state
 
     init {
         getNotes()
