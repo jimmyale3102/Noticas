@@ -41,16 +41,14 @@ import dev.alejo.noticas.ui.notes.components.NoteItem
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.NotesScreen(
-    superInnerPadding: PaddingValues = PaddingValues(),
+    modifier: Modifier,
     animatedVisibilityScope: AnimatedVisibilityScope,
     state: NotesState,
     onEvent: (NotesEvent) -> Unit = {},
     onCreateNote: () -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier
-            .padding(superInnerPadding)
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         topBar = { NotesAppBar() },
         floatingActionButton = {
             FloatingActionButton(
