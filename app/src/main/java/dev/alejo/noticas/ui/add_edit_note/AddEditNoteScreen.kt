@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalSharedTransitionApi::class)
+@file:Suppress("UNREACHABLE_CODE")
 
 package dev.alejo.noticas.ui.add_edit_note
 
@@ -8,17 +9,38 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.DarkGray
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.alejo.noticas.ui.add_edit_note.components.NoticasBackgroundColors
 import dev.alejo.noticas.ui.notes.CREATE_NOTE_FAB_KEY
 
@@ -27,26 +49,125 @@ fun SharedTransitionScope.AddEditNoteScreen(
     modifier: Modifier = Modifier,
     animatedVisibilityScope: AnimatedVisibilityScope,
     state: AddEditNoteState,
-    onColorSelected: (color: Int) -> Unit
+    onColorSelected: (color: Int) -> Unit,
+    onTitleChange: (title: String) -> Unit,
+    onContentChange: (content: String) -> Unit,
+    onSaveNote: () -> Unit
 ) {
+
+    val backgroundColor = rememberSaveable { mutableStateOf(state.backgroundColor.toArgb()) }
     val animatedBackground by animateColorAsState(
-        targetValue = state.backgroundColor,
+        targetValue = Color(backgroundColor.value),
         animationSpec = tween(durationMillis = 500),
         label = "background color"
     )
-    Box(
-        modifier
+
+    LaunchedEffect(state.backgroundColor) {
+        backgroundColor.value = state.backgroundColor.toArgb()
+    }
+
+    Scaffold(
+        Modifier
             .sharedBounds(
                 sharedContentState = rememberSharedContentState(key = CREATE_NOTE_FAB_KEY),
                 animatedVisibilityScope = animatedVisibilityScope
             )
             .background(animatedBackground)
             .fillMaxSize()
-    ) {
-
-        NoticasBackgroundColors(selectedColor = state.backgroundColor) { colorSelected -> onColorSelected(colorSelected)}
-        Button(modifier = Modifier.padding(top = 64.dp), onClick = { onColorSelected(Black.toArgb()) }) {
-            Text("Add new note")
+            .imePadding(),
+        topBar = {
+            NoticasBackgroundColors(
+                modifier.padding(vertical = 16.dp),
+                selectedColor = state.backgroundColor
+            ) { colorSelected ->
+                onColorSelected(
+                    colorSelected
+                )
+            }
+        },
+        floatingActionButton = {
+            SmallFloatingActionButton(
+                onClick = { onSaveNote() }
+            ) {
+                Icon(imageVector = Icons.Default.Check, contentDescription = null)
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            Modifier
+                .background(animatedBackground)
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            TextField(
+                value = state.title,
+                onValueChange = { onTitleChange(it) },
+                placeholder = {
+                    Text(
+                        "Título",
+                        color = DarkGray,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Transparent,
+                    unfocusedContainerColor = Transparent,
+                    disabledContainerColor = Transparent,
+                    focusedIndicatorColor = Transparent,
+                    unfocusedIndicatorColor = Transparent,
+                ),
+                singleLine = true,
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next,
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
+                textStyle = TextStyle(
+                    color = Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp
+                )
+            )
+            TextField(
+                value = state.content,
+                onValueChange = { onContentChange(it) },
+                placeholder = {
+                    Text(
+                        "Descripción",
+                        color = DarkGray,
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Transparent,
+                    unfocusedContainerColor = Transparent,
+                    disabledContainerColor = Transparent,
+                    focusedIndicatorColor = Transparent,
+                    unfocusedIndicatorColor = Transparent,
+                ),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
+                textStyle = TextStyle(
+                    color = Black
+                ),
+                singleLine = false
+            )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SharedTransitionScope.AddEditNoteScreenPreview() {
+    AddEditNoteScreen(
+        state = AddEditNoteState(), onColorSelected = {},
+        modifier = Modifier,
+        onTitleChange = {},
+        onContentChange = { },
+        animatedVisibilityScope = TODO(),
+        onSaveNote = {}
+    )
 }
