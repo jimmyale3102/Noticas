@@ -17,7 +17,9 @@ import dev.alejo.noticas.ui.theme.powderLavender
 import dev.alejo.noticas.ui.theme.skyBlue
 import dev.alejo.noticas.ui.theme.softOrange
 import dev.alejo.noticas.ui.theme.warmBeige
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity
 data class Note(
     val title: String,
