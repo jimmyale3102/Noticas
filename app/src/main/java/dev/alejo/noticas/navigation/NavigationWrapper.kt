@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import dev.alejo.noticas.ui.add_edit_note.AddEditNoteEvent
 import dev.alejo.noticas.ui.add_edit_note.AddEditNoteScreen
 import dev.alejo.noticas.ui.add_edit_note.AddEditNoteViewModel
@@ -27,21 +28,31 @@ fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
                 val viewModel = hiltViewModel<NotesViewModel>()
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
-                LaunchedEffect(true) {
+                LaunchedEffect(Unit) {
                     viewModel.onEvent(NotesEvent.GetAllNotes)
                 }
 
                 NotesScreen(
                     modifier = modifier,
                     state = state,
-                    animatedVisibilityScope = this
-                ) {
-                    navController.navigate(Screens.AddEditNote)
-                }
+                    animatedVisibilityScope = this,
+                    onNoteSelected = { noteSelected ->
+                        navController.navigate(Screens.AddEditNote(noteSelected.id))
+                    },
+                    onCreateNote = { navController.navigate(Screens.AddEditNote()) },
+                )
             }
             composable<Screens.AddEditNote> {
+                val args = it.toRoute<Screens.AddEditNote>()
                 val viewModel = hiltViewModel<AddEditNoteViewModel>()
                 val state by viewModel.state.collectAsStateWithLifecycle()
+
+                LaunchedEffect(args.noteId) {
+                    if (args.noteId != null) {
+                        viewModel.onEvent(AddEditNoteEvent.SetNoteById(args.noteId))
+                    }
+                }
+
                 AddEditNoteScreen(
                     modifier = modifier,
                     animatedVisibilityScope = this,
