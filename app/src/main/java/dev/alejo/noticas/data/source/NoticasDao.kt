@@ -17,7 +17,7 @@ interface NoticasDao {
     @Query("SELECT * FROM note WHERE id = :id")
     fun getNoteById(id: Int): Note?
 
-    @Query("SELECT * FROM note")
+    @Query("SELECT * FROM note ORDER BY timestamp DESC")
     fun getAllNotes(): Flow<List<Note>>
 
     @Delete
