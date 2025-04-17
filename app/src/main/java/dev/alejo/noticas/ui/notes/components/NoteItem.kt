@@ -40,14 +40,14 @@ fun NoteItem(note: Note, onNoteClicked: (note: Note) -> Unit) {
 
     val foldedGradient = if (isSystemInDarkTheme()) {
         Brush.linearGradient(
-            0.9f to Color(note.color).copy(1f),
-            0.91f to Color.White.copy(0.1f),
+            0.4f to Color(note.color).copy(1f),
+            0.95f to Color.White.copy(0.1f),
             1f to Color.Black.copy(0.6f)
         )
     } else {
         Brush.linearGradient(
-            0.9f to Color(note.color).copy(1f),
-            0.91f to Color.Black.copy(0.05f),
+            0.94f to Color(note.color).copy(1f),
+            0.95f to Color.Black.copy(0.05f),
             1f to Color.White.copy(0.8f)
         )
     }
@@ -98,6 +98,7 @@ fun NoteItem(note: Note, onNoteClicked: (note: Note) -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 1,
                     color = Color.Black
                 )
                 Text(
