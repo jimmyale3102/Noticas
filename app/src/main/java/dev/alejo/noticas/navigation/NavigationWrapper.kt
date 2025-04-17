@@ -3,6 +3,7 @@ package dev.alejo.noticas.navigation
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,6 +14,7 @@ import androidx.navigation.compose.composable
 import dev.alejo.noticas.ui.add_edit_note.AddEditNoteEvent
 import dev.alejo.noticas.ui.add_edit_note.AddEditNoteScreen
 import dev.alejo.noticas.ui.add_edit_note.AddEditNoteViewModel
+import dev.alejo.noticas.ui.notes.NotesEvent
 import dev.alejo.noticas.ui.notes.NotesScreen
 import dev.alejo.noticas.ui.notes.NotesViewModel
 
@@ -24,6 +26,11 @@ fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
             composable<Screens.Notes> {
                 val viewModel = hiltViewModel<NotesViewModel>()
                 val state by viewModel.state.collectAsStateWithLifecycle()
+
+                LaunchedEffect(true) {
+                    viewModel.onEvent(NotesEvent.GetAllNotes)
+                }
+
                 NotesScreen(
                     modifier = modifier,
                     state = state,
@@ -41,6 +48,16 @@ fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
                     state = state,
                     onColorSelected = { color ->
                         viewModel.onEvent(AddEditNoteEvent.ChangeColor(color))
+                    },
+                    onTitleChange = { title ->
+                        viewModel.onEvent(AddEditNoteEvent.ChangeTitle(title))
+                    },
+                    onContentChange = { content ->
+                        viewModel.onEvent(AddEditNoteEvent.ChangeContent(content))
+                    },
+                    onSaveNote = {
+                        viewModel.onEvent(AddEditNoteEvent.SaveNote)
+                        navController.popBackStack()
                     }
                 )
             }
