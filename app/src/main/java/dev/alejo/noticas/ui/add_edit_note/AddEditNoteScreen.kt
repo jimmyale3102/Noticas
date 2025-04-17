@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalSharedTransitionApi::class)
+@file:OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSharedTransitionApi::class)
 @file:Suppress("UNREACHABLE_CODE")
 
 package dev.alejo.noticas.ui.add_edit_note
