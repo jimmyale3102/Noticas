@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
@@ -33,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.alejo.noticas.R
 import dev.alejo.noticas.domain.model.Note
@@ -45,8 +43,8 @@ fun SharedTransitionScope.NotesScreen(
     modifier: Modifier,
     animatedVisibilityScope: AnimatedVisibilityScope,
     state: NotesState,
-    onEvent: (NotesEvent) -> Unit = {},
-    onCreateNote: () -> Unit,
+    onNoteSelected: (noteSelected: Note) -> Unit,
+    onCreateNote: () -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -68,7 +66,11 @@ fun SharedTransitionScope.NotesScreen(
     ) { innerPadding ->
         AnimatedContent(state.notes) { notesData ->
             if (notesData == null) {
-                Box(Modifier.fillMaxSize().padding(innerPadding)) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
             } else {
@@ -83,7 +85,8 @@ fun SharedTransitionScope.NotesScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        notes = notesData
+                        notes = notesData,
+                        onNoteSelected = onNoteSelected
                     )
                 }
             }
@@ -114,13 +117,18 @@ fun EmptyNotesContent(modifier: Modifier) {
 }
 
 @Composable
-fun NotesContent(modifier: Modifier, notes: List<Note>) {
-    LazyVerticalGrid(
-        modifier = modifier.padding(horizontal = 16.dp),
-        columns = GridCells.Fixed(2)
+fun NotesContent(
+    modifier: Modifier,
+    notes: List<Note>,
+    onNoteSelected: (noteSelected: Note) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier.padding(horizontal = 16.dp)
     ) {
         items(notes.size) { index ->
-            NoteItem(notes[index]) {}
+            NoteItem(notes[index]) { noteSelected ->
+                onNoteSelected(noteSelected)
+            }
         }
     }
 }
@@ -152,41 +160,4 @@ fun NotesAppBar() {
             Icon(imageVector = Icons.Filled.Info, contentDescription = null)
         }
     }
-}
-
-@Preview
-@Composable
-fun NotesAppBarPreview() {
-//    NotesScreen(
-//        state = NotesState(
-//            notes = listOf(
-//                Note(
-//                    title = "Hey youuu",
-//                    content = "Content",
-//                    timestamp = 0,
-//                    color = Note.noteColors[1].toArgb()
-//                ),
-//                Note(
-//                    title = "Title",
-//                    content = "Content",
-//                    timestamp = 0,
-//                    color = Note.noteColors[3].toArgb()
-//                ),
-//                Note(
-//                    title = "Proo",
-//                    content = "Content",
-//                    timestamp = 0,
-//                    color = Note.noteColors[2].toArgb()
-//                ),
-//                Note(
-//                    title = "Title",
-//                    content = "Content",
-//                    timestamp = 0,
-//                    color = Note.noteColors[0].toArgb()
-//                )
-//            )
-//        ),
-//        onEvent = {},
-//        onCreateNote = {}
-//    )
 }
