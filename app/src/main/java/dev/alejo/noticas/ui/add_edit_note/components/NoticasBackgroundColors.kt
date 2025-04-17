@@ -29,18 +29,19 @@ import dev.alejo.noticas.domain.model.Note
 
 @Composable
 fun NoticasBackgroundColors(
+    modifier: Modifier = Modifier,
     selectedColor: Color,
     onColorSelected: (color: Int) -> Unit
 ) {
     val scrollState = rememberScrollState()
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Note.noteColors.forEach { color ->
-            val borderColor = if(color == selectedColor) {
+            val borderColor = if (color == selectedColor) {
                 selectedColor
             } else {
                 Color.Black
@@ -52,11 +53,11 @@ fun NoticasBackgroundColors(
             )
             Box(
                 modifier = Modifier
-                    .size(52.dp)
+                    .size(48.dp)
                     .shadow(elevation = 8.dp, shape = CircleShape)
                     .clip(CircleShape)
                     .background(Color(color.toArgb()))
-                    .border(4.dp, animatedBorderColor, CircleShape)
+                    .border(3.dp, animatedBorderColor, CircleShape)
                     .clickable { onColorSelected(color.toArgb()) }
             )
         }
@@ -66,9 +67,11 @@ fun NoticasBackgroundColors(
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun NoticasBackgroundColorsPreview() {
-    Box(Modifier
-        .fillMaxSize()
-        .padding(top = 64.dp)) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(top = 64.dp)
+    ) {
         NoticasBackgroundColors(selectedColor = Color.White) { }
     }
 }
