@@ -5,5 +5,7 @@ import androidx.compose.ui.graphics.toArgb
 import dev.alejo.noticas.domain.model.Note
 
 data class AddEditNoteState(
-    val backgroundColor: Color = Color(Note.noteColors.random().toArgb())
+    val backgroundColor: Color = Color(Note.noteColors.random().toArgb()),
+    val title: String = "",
+    val content: String = ""
 )
