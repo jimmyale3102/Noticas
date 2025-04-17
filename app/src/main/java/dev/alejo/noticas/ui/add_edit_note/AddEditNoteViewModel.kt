@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.alejo.noticas.domain.model.Note
+import dev.alejo.noticas.domain.repository.Repository
 import dev.alejo.noticas.domain.usecase.AddNoteUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddEditNoteViewModel @Inject constructor(
-    private val addNoteUseCase: AddNoteUseCase
+    private val addNoteUseCase: AddNoteUseCase,
+    private val repository: Repository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddEditNoteState())
@@ -33,6 +35,7 @@ class AddEditNoteViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     addNoteUseCase(
                         Note(
+                            id = state.value.id,
                             title = state.value.title,
                             content = state.value.content,
                             color = state.value.backgroundColor.toArgb(),
@@ -51,6 +54,20 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.ChangeContent -> {
                 _state.update { state ->
                     state.copy(content = event.content)
+                }
+            }
+
+            is AddEditNoteEvent.SetNoteById -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                   val note = repository.getNoteById(event.noteId!!)
+                    _state.update {
+                        it.copy(
+                            id = note?.id,
+                            title = note?.title.orEmpty(),
+                            content = note?.content.orEmpty(),
+                            backgroundColor = Color(note?.color ?: Note.noteColors[0].toArgb())
+                        )
+                    }
                 }
             }
         }
