@@ -2,13 +2,18 @@ package dev.alejo.noticas.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import dev.alejo.noticas.ui.theme.babyBlue
+import dev.alejo.noticas.ui.theme.butterYellow
 import dev.alejo.noticas.ui.theme.coralPink
 import dev.alejo.noticas.ui.theme.lavender
 import dev.alejo.noticas.ui.theme.lightGreen
 import dev.alejo.noticas.ui.theme.lightLilac
+import dev.alejo.noticas.ui.theme.mintCream
 import dev.alejo.noticas.ui.theme.mintGreen
 import dev.alejo.noticas.ui.theme.paleTeal
+import dev.alejo.noticas.ui.theme.peachCream
 import dev.alejo.noticas.ui.theme.pinkViolet
+import dev.alejo.noticas.ui.theme.powderLavender
 import dev.alejo.noticas.ui.theme.skyBlue
 import dev.alejo.noticas.ui.theme.softOrange
 import dev.alejo.noticas.ui.theme.warmBeige
@@ -23,15 +28,21 @@ data class Note(
 ) {
     companion object {
         val noteColors = listOf(
-            pinkViolet,
-            coralPink,
-            lightGreen,
-            softOrange,
-            mintGreen,
             lavender,
-            paleTeal,
+            pinkViolet,
             lightLilac,
-            skyBlue, warmBeige
+            powderLavender,
+            coralPink,
+            softOrange,
+            warmBeige,
+            butterYellow,
+            peachCream,
+            lightGreen,
+            mintGreen,
+            mintCream,
+            paleTeal,
+            skyBlue,
+            babyBlue
         )
     }
 }
