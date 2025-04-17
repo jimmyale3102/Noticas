@@ -6,8 +6,8 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -66,19 +67,25 @@ fun SharedTransitionScope.NotesScreen(
         }
     ) { innerPadding ->
         AnimatedContent(state.notes) { notesData ->
-            if (notesData.isEmpty()) {
-                EmptyNotesContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                )
+            if (notesData == null) {
+                Box(Modifier.fillMaxSize().padding(innerPadding)) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
             } else {
-                NotesContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    notes = notesData
-                )
+                if (notesData.isEmpty()) {
+                    EmptyNotesContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    )
+                } else {
+                    NotesContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        notes = notesData
+                    )
+                }
             }
         }
     }
@@ -110,12 +117,10 @@ fun EmptyNotesContent(modifier: Modifier) {
 fun NotesContent(modifier: Modifier, notes: List<Note>) {
     LazyVerticalGrid(
         modifier = modifier.padding(horizontal = 16.dp),
-        columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        columns = GridCells.Fixed(2)
     ) {
         items(notes.size) { index ->
-            NoteItem(notes[index])
+            NoteItem(notes[index]) {}
         }
     }
 }
