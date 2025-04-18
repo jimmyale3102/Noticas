@@ -45,7 +45,8 @@ fun SharedTransitionScope.NotesScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     state: NotesState,
     onNoteSelected: (noteSelected: Note) -> Unit,
-    onCreateNote: () -> Unit
+    onCreateNote: () -> Unit,
+    onDelete: (note: Note) -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -88,9 +89,7 @@ fun SharedTransitionScope.NotesScreen(
                             .padding(innerPadding),
                         notes = notesData,
                         onNoteSelected = onNoteSelected,
-                        onDelete = {
-
-                        }
+                        onDelete = { note -> onDelete(note) }
                     )
                 }
             }
@@ -125,7 +124,7 @@ fun NotesContent(
     modifier: Modifier,
     notes: List<Note>,
     onNoteSelected: (noteSelected: Note) -> Unit,
-    onDelete: () -> Unit
+    onDelete: (note: Note) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
@@ -136,7 +135,7 @@ fun NotesContent(
         ) { index ->
             SwipeToDeleteContainer(
                 item = notes[index],
-                onDelete = { },
+                onDelete = { note -> onDelete(note) },
                 itemPadding = 8.dp
             ) {
                 NoteItem(notes[index]) { noteSelected ->
