@@ -4,38 +4,31 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import dev.alejo.noticas.R
 import dev.alejo.noticas.domain.model.Note
+import dev.alejo.noticas.ui.notes.components.EmptyNotesContent
 import dev.alejo.noticas.ui.notes.components.NoteItem
+import dev.alejo.noticas.ui.notes.components.NotesAppBar
 import dev.alejo.noticas.ui.util.SwipeToDeleteContainer
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -46,11 +39,29 @@ fun SharedTransitionScope.NotesScreen(
     state: NotesState,
     onNoteSelected: (noteSelected: Note) -> Unit,
     onCreateNote: () -> Unit,
-    onDelete: (note: Note) -> Unit
+    onDelete: (note: Note) -> Unit,
+    onSearchNote: (text: String) -> Unit,
+    onCancelSearch: () -> Unit
 ) {
+    var searchBarText by rememberSaveable { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { NotesAppBar() },
+        topBar = {
+            NotesAppBar(
+                searchBarText = searchBarText,
+                onSearchBarChange = { text -> searchBarText = text },
+                onSearchNote = { onSearchNote(searchBarText) },
+                onCancelSearch = {
+                    searchBarText = ""
+                    onCancelSearch()
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onCreateNote() },
@@ -67,22 +78,18 @@ fun SharedTransitionScope.NotesScreen(
         }
     ) { innerPadding ->
         AnimatedContent(state.notes) { notesData ->
-            if (notesData == null) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                }
-            } else {
-                if (notesData.isEmpty()) {
-                    EmptyNotesContent(
-                        modifier = Modifier
+            when {
+                notesData == null -> {
+                    Box(
+                        Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
-                    )
-                } else {
+                    ) {
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    }
+                }
+
+                notesData.isNotEmpty() -> {
                     NotesContent(
                         modifier = Modifier
                             .fillMaxSize()
@@ -92,30 +99,28 @@ fun SharedTransitionScope.NotesScreen(
                         onDelete = { note -> onDelete(note) }
                     )
                 }
+
+                searchBarText.isEmpty() && notesData.isEmpty() -> {
+                    EmptyNotesContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        imageResource = R.drawable.empty_notes,
+                        description = "No hay notas"
+                    )
+                }
+
+                searchBarText.isNotEmpty() && notesData.isEmpty() -> {
+                    EmptyNotesContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        imageResource = R.drawable.empty_search,
+                        description = "No se encontraron resultados para '$searchBarText'"
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-fun EmptyNotesContent(modifier: Modifier) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(
-            space = 16.dp,
-            alignment = Alignment.CenterVertically
-        )
-    ) {
-        Image(
-            painter = painterResource(R.drawable.empty_notes),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 64.dp)
-        )
-        Text(text = "No hay notas")
     }
 }
 
@@ -142,35 +147,6 @@ fun NotesContent(
                     onNoteSelected(noteSelected)
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NotesAppBar() {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(TopAppBarDefaults.MediumAppBarCollapsedHeight)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End
-    ) {
-        SmallFloatingActionButton(
-            onClick = { },
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-        ) {
-            Icon(imageVector = Icons.Filled.Search, contentDescription = null)
-        }
-        SmallFloatingActionButton(
-            modifier = Modifier.padding(start = 16.dp),
-            onClick = { },
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-        ) {
-            Icon(imageVector = Icons.Filled.Info, contentDescription = null)
         }
     }
 }
