@@ -40,6 +40,9 @@ fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
                         navController.navigate(Screens.AddEditNote(noteSelected.id))
                     },
                     onCreateNote = { navController.navigate(Screens.AddEditNote()) },
+                    onDelete = { note ->
+                        viewModel.onEvent(NotesEvent.DeleteNote(note))
+                    }
                 )
             }
             composable<Screens.AddEditNote> {
