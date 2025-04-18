@@ -29,14 +29,9 @@ class NotesViewModel @Inject constructor(
     fun onEvent(notesEvent: NotesEvent) {
         when (notesEvent) {
             is NotesEvent.DeleteNote -> {
-//                viewModelScope.launch {
-//                    notesRepository.deleteNote(notesEvent.note)
-//                }
-            }
-            is NotesEvent.EditNote -> {
-//                viewModelScope.launch {
-//                    notesRepository.editNote(notesEvent.note)
-//                }
+                viewModelScope.launch {
+                    notesRepository.deleteNote(notesEvent.note)
+                }
             }
 
             NotesEvent.GetAllNotes -> {
