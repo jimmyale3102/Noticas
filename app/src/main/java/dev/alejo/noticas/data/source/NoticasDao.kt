@@ -23,4 +23,7 @@ interface NoticasDao {
     @Delete
     fun deleteNote(note: Note)
 
+    @Query("SELECT * FROM note WHERE LOWER(title) LIKE '%' || LOWER(:text) || '%' OR LOWER(content) LIKE '%' || LOWER(:text) || '%' ORDER BY timestamp DESC")
+    fun getNotesBySearch(text: String): Flow<List<Note>>
+
 }
