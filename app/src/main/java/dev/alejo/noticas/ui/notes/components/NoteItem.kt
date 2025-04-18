@@ -2,24 +2,18 @@ package dev.alejo.noticas.ui.notes.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.alejo.noticas.domain.model.Note
+import dev.alejo.noticas.ui.theme.NoteShape
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -38,84 +33,37 @@ fun NoteItem(note: Note, onNoteClicked: (note: Note) -> Unit) {
         Locale.getDefault()
     ).format(Date(note.timestamp))
 
-    val foldedGradient = if (isSystemInDarkTheme()) {
-        Brush.linearGradient(
-            0.4f to Color(note.color).copy(1f),
-            0.95f to Color.White.copy(0.1f),
-            1f to Color.Black.copy(0.6f)
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .clip(NoteShape)
+            .background(Color(note.color))
+            .clickable { onNoteClicked(note) }
+            .padding(start = 16.dp, end = 8.dp, top = 16.dp, bottom = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.End
+    ) {
+        Text(
+            text = note.title,
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            color = Color.Black
         )
-    } else {
-        Brush.linearGradient(
-            0.94f to Color(note.color).copy(1f),
-            0.95f to Color.Black.copy(0.05f),
-            1f to Color.White.copy(0.8f)
+        Text(
+            text = note.content,
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = Color.Black
         )
-    }
-    Box(Modifier.padding(6.dp)) {
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onNoteClicked(note) },
-            colors = CardDefaults.elevatedCardColors(
-                containerColor = Color(note.color)
-            ),
-            elevation = CardDefaults.elevatedCardElevation(
-                defaultElevation = 8.dp
-            ),
-            shape = RoundedCornerShape(
-                topStart = 18.dp,
-                topEnd = 0.dp,
-                bottomStart = 0.dp,
-                bottomEnd = 0.dp
-            )
-        ) {
-            Column(
-                modifier = Modifier
-                    .background(
-                        Brush.verticalGradient(
-                            0f to Color.Black.copy(0.2f),
-                            0.1f to Color.Black.copy(0.05f),
-                            0.9f to Color.White.copy(0.05f),
-                            1f to Color.White.copy(0.1f)
-                        ),
-                        shape = RectangleShape
-                    )
-                    .background(
-                        foldedGradient,
-                        shape = RectangleShape
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = Color(note.color),
-                        shape = RectangleShape
-                    )
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = note.title,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    color = Color.Black
-                )
-                Text(
-                    text = note.content,
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Black
-                )
-                Text(
-                    text = dateFormatted,
-                    maxLines = 1,
-                    fontSize = 12.sp,
-                    color = Color.Black
-                )
-            }
-        }
+        Text(
+            text = dateFormatted,
+            maxLines = 1,
+            fontSize = 12.sp,
+            color = Color.Black
+        )
     }
 }
 
