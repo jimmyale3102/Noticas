@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import dev.alejo.noticas.R
 import dev.alejo.noticas.domain.model.Note
 import dev.alejo.noticas.ui.notes.components.NoteItem
+import dev.alejo.noticas.ui.util.SwipeToDeleteContainer
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -86,7 +87,10 @@ fun SharedTransitionScope.NotesScreen(
                             .fillMaxSize()
                             .padding(innerPadding),
                         notes = notesData,
-                        onNoteSelected = onNoteSelected
+                        onNoteSelected = onNoteSelected,
+                        onDelete = {
+
+                        }
                     )
                 }
             }
@@ -120,14 +124,24 @@ fun EmptyNotesContent(modifier: Modifier) {
 fun NotesContent(
     modifier: Modifier,
     notes: List<Note>,
-    onNoteSelected: (noteSelected: Note) -> Unit
+    onNoteSelected: (noteSelected: Note) -> Unit,
+    onDelete: () -> Unit
 ) {
     LazyColumn(
-        modifier = modifier.padding(horizontal = 16.dp)
+        modifier = modifier.fillMaxSize()
     ) {
-        items(notes.size) { index ->
-            NoteItem(notes[index]) { noteSelected ->
-                onNoteSelected(noteSelected)
+        items(
+            count = notes.size,
+            key = { it }
+        ) { index ->
+            SwipeToDeleteContainer(
+                item = notes[index],
+                onDelete = { },
+                itemPadding = 8.dp
+            ) {
+                NoteItem(notes[index]) { noteSelected ->
+                    onNoteSelected(noteSelected)
+                }
             }
         }
     }
