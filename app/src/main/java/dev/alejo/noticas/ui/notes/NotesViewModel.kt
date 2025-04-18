@@ -34,8 +34,14 @@ class NotesViewModel @Inject constructor(
                 }
             }
 
-            NotesEvent.GetAllNotes -> {
-                getNotes()
+            is NotesEvent.GetAllNotes -> { getNotes() }
+
+            is NotesEvent.SearchNote -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    notesRepository.getNotesBySearch(notesEvent.text.lowercase()).collect { notes ->
+                        _state.value = _state.value.copy(notes = notes)
+                    }
+                }
             }
         }
     }
