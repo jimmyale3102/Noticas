@@ -1,5 +1,4 @@
-@file:OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSharedTransitionApi::class)
-@file:Suppress("UNREACHABLE_CODE")
+@file:OptIn(ExperimentalSharedTransitionApi::class)
 
 package dev.alejo.noticas.ui.add_edit_note
 
@@ -26,7 +25,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,12 +37,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.alejo.noticas.ui.add_edit_note.components.NoticasBackgroundColors
 import dev.alejo.noticas.ui.notes.CREATE_NOTE_FAB_KEY
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.AddEditNoteScreen(
     modifier: Modifier = Modifier,
@@ -55,15 +54,15 @@ fun SharedTransitionScope.AddEditNoteScreen(
     onSaveNote: () -> Unit
 ) {
 
-    val backgroundColor = rememberSaveable { mutableStateOf(state.backgroundColor.toArgb()) }
+    val backgroundColor = rememberSaveable { mutableIntStateOf(state.backgroundColor.toArgb()) }
     val animatedBackground by animateColorAsState(
-        targetValue = Color(backgroundColor.value),
+        targetValue = Color(backgroundColor.intValue),
         animationSpec = tween(durationMillis = 500),
         label = "background color"
     )
 
     LaunchedEffect(state.backgroundColor) {
-        backgroundColor.value = state.backgroundColor.toArgb()
+        backgroundColor.intValue = state.backgroundColor.toArgb()
     }
 
     Scaffold(
@@ -157,17 +156,4 @@ fun SharedTransitionScope.AddEditNoteScreen(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SharedTransitionScope.AddEditNoteScreenPreview() {
-    AddEditNoteScreen(
-        state = AddEditNoteState(), onColorSelected = {},
-        modifier = Modifier,
-        onTitleChange = {},
-        onContentChange = { },
-        animatedVisibilityScope = TODO(),
-        onSaveNote = {}
-    )
 }
