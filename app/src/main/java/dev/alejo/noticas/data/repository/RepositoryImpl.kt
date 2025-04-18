@@ -24,4 +24,8 @@ class RepositoryImpl(
         dao.deleteNote(note)
     }
 
+    override suspend fun getNotesBySearch(text: String): Flow<List<Note>> {
+        return dao.getNotesBySearch(text)
+    }
+
 }
