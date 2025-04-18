@@ -42,6 +42,12 @@ fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
                     onCreateNote = { navController.navigate(Screens.AddEditNote()) },
                     onDelete = { note ->
                         viewModel.onEvent(NotesEvent.DeleteNote(note))
+                    },
+                    onSearchNote = { text ->
+                        viewModel.onEvent(NotesEvent.SearchNote(text))
+                    },
+                    onCancelSearch = {
+                        viewModel.onEvent(NotesEvent.GetAllNotes)
                     }
                 )
             }
